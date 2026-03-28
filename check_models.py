@@ -1,11 +1,11 @@
 # check_models.py
-import google.generativeai as genai
+# Example: Check available models with Groq API (pseudo-code)
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-
-for model in genai.list_models():
-    if "generateContent" in model.supported_generation_methods:
-        print(model.name)
+# You would use the Groq Python SDK or requests to list models, e.g.:
+# import groq
+# groq_client = groq.Client(api_key=os.getenv("GROQ_API_KEY"))
+# print(groq_client.list_models())
+print("Replace this with actual Groq API model listing code.")

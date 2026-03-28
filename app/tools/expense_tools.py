@@ -50,6 +50,74 @@ def add_expense(
         db.close()
 
 
+def update_expense(
+    expense_id: int,
+    amount: Optional[float] = None,
+    category: Optional[str] = None,
+    description: Optional[str] = None,
+    expense_date: Optional[date] = None,
+) -> dict:
+    """Update an existing expense by id.
+
+    Only fields that are provided (not None) will be updated.
+    Returns the updated expense data or an error.
+    """
+    db = get_db()
+    try:
+        expense = db.query(Expense).filter(Expense.id == expense_id).first()
+        if not expense:
+            return {"success": False, "error": "Expense not found"}
+
+        if amount is not None:
+            expense.amount = amount
+        if category is not None:
+            expense.category = category.lower().strip()
+        if description is not None:
+            expense.description = description
+        if expense_date is not None:
+            expense.expense_date = expense_date
+
+        db.commit()
+        db.refresh(expense)
+
+        return {
+            "success": True,
+            "id": expense.id,
+            "amount": expense.amount,
+            "category": expense.category,
+            "description": expense.description,
+            "expense_date": str(expense.expense_date),
+        }
+    except Exception as e:
+        db.rollback()
+        return {"success": False, "error": str(e)}
+    finally:
+        db.close()
+
+
+def delete_expense(expense_id: int) -> dict:
+    """Delete an existing expense by id.
+
+    Use together with get_recent_expenses to let the user
+    confirm which expense they want to remove.
+    """
+    db = get_db()
+    try:
+        expense = db.query(Expense).filter(Expense.id == expense_id).first()
+        if not expense:
+            return {"success": False, "error": "Expense not found"}
+
+        db.delete(expense)
+        db.commit()
+
+        return {"success": True, "id": expense_id}
+    except Exception as e:
+        db.rollback()
+        return {"success": False, "error": str(e)}
+    finally:
+        db.close()
+
+
 def get_monthly_spending(year: int, month: int) -> dict:
     """
     Get total amount spent in a given month.
@@ -126,6 +194,27 @@ def get_recent_expenses(limit: int = 10) -> dict:
                 }
                 for e in expenses
             ]
+        }
+    finally:
+        db.close()
+
+
+def get_spending_on_date(target_date: date) -> dict:
+    """Get total amount spent on a specific calendar date.
+
+    Used for questions like "how much did I spend today?".
+    """
+    db = get_db()
+    try:
+        total = (
+            db.query(func.sum(Expense.amount))
+            .filter(Expense.expense_date == target_date)
+            .scalar()
+        ) or 0
+
+        return {
+            "date": str(target_date),
+            "total_spent": round(total, 2),
         }
     finally:
         db.close()

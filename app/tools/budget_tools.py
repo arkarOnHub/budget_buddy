@@ -54,6 +54,26 @@ def set_budget(month: str, amount: float) -> dict:
         db.close()
 
 
+def delete_budget(month: str) -> dict:
+    """
+    Delete the budget for a given month.
+    """
+    db = get_db()
+    try:
+        budget = db.query(Budget).filter(Budget.month == month).first()
+        if not budget:
+            return {"success": False, "error": f"No budget found for month {month}"}
+
+        db.delete(budget)
+        db.commit()
+        return {"success": True, "action": "deleted", "month": month}
+    except Exception as e:
+        db.rollback()
+        return {"success": False, "error": str(e)}
+    finally:
+        db.close()
+
+
 def get_remaining_budget(year: int, month: int) -> dict:
     """
     Calculate how much budget is left for a given month.

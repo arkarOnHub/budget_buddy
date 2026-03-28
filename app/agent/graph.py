@@ -45,12 +45,18 @@ def agent_node(state: AgentState) -> dict:
         month_num=f"{today.month:02d}",
     )
 
+    # Limit how much history we send each call to control token usage
+    history = state["messages"]
+    MAX_MESSAGES = 12  # keep only the last N messages (user + assistant + tools)
+    if len(history) > MAX_MESSAGES:
+        history = history[-MAX_MESSAGES:]
+
     llm = get_llm()
 
     # Bind tools to the LLM so it knows what it can call
     llm_with_tools = llm.bind_tools(tools)
 
-    messages = [SystemMessage(content=system_prompt)] + state["messages"]
+    messages = [SystemMessage(content=system_prompt)] + history
     response = llm_with_tools.invoke(messages)
 
     return {"messages": [response]}
