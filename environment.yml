@@ -1,0 +1,19 @@
+name: budget_buddy
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - pip
+  - pandas
+  - plotly
+  - sqlalchemy
+  - pydantic
+  - streamlit
+  - python-dotenv
+  - pip:
+      - langchain-groq
+      - langgraph
+      - langchain-core
+      - langchain
+      - groq
