@@ -2,6 +2,11 @@
 
 Budget Buddy is a personal finance management application designed to help you track your expenses, manage your budget, and gain insights into your spending habits. The project is organized with a modular backend (database, models, tools, and agent logic) and a user-friendly UI built with Streamlit.
 
+# Members
+
+Htet Arkar 66011535
+Myat Oo Swe 66011644
+
 ## Features
 - Track and categorize expenses
 - Manage budgets
